@@ -72,29 +72,53 @@ app.listen(sitePort, siteIp, function() {
 
 app.get('/', function(req,res) {
 
-    var html = "<html><head><script>function refresh() {setTimeout(function () {location.reload()}, 2000);} refresh();</script>";
-    html+= "<style>.character-block { border: 4px solid gray; font-size: 18px; text-align: center; color: white; float: left; margin: 10 }</style></head>";
+    var html = "<html><head>";
+    html += "<script>function refresh() {setTimeout(function () {location.reload()}, 2000);} refresh();</script>";
+    html += "<style>.character-block { border: 4px solid gray; font-size: 18px; text-align: center; color: white; float: left; margin: 10 }</style></head>";
     
     html += "<body style='background-color: Black'><div>"
     for (const key in characters) {
         if (characters.hasOwnProperty(key)) {
             const element = characters[key];
+            var color = "";
+            var text = "";
             html += "<div class='character-block' style='width: 130px; padding: 6px 8px 6px 8px;'>";
+            
+            // Name and Level
             html += "<div font-size: 16px;>" + characters[key].name + "<font style='color:gray; font-size: 15'> ["+characters[key].level+"]</font></div>";
-            html += "<div>" + characters[key].ctype + "</div>";
-            html += "<div>State: ";
-            if(characters[key].isRip) html += "RIP</div>";
-            else html += "ALIVE</div>";
+            
+            
+            // Class type
+            if(characters[key].ctype == "mage") color = "rgb(0, 204, 255)";
+            else if(characters[key].ctype == "merchant") color = "rgb(230, 184, 0)";
+            html += "<div style='color:" + color + "'>" + characters[key].ctype + "</div>";
 
+            // EXP progress bar
             html += "<div style='background: black; margin-top: 3px; padding: 2px; border: 1px solid gray; display: block; position: relative;'>"
                         + "<div style='background: rgb(22, 109, 17); width: "+ characters[key].xp +"%; height: 20px;'></div>"
                         + "<div style='position: absolute; left: 10%; top: 0px; line-height: 24px; text-align: center;'>Exp "+ characters[key].xp.toFixed(2) +"%</div>"
                     + "</div>"; 
-            html += "<div>" + characters[key].xpps.toFixed(0) + " Xp/sec</div>";
-            html += "<div>INV " + characters[key].inv + "</div>";
-            html += "<div>Target: " + characters[key].target + "</div>";
-            //html += "<div>" + characters[key].gps.toFixed(0) + " Gold/sec</div>";
-            html += "<div>toUp: " + characters[key].toUp + "</div>";
+
+            // State
+            if(characters[key].isRip)   { color = "rgb(204, 0, 0)"; text = "RIP"; }
+            else                        { color = "rgb(51, 204, 51)"; text = "ALIVE"; }
+            html += "<div style='padding: 10 0 0 0'>State: <font style='color: " + color + "; font-size: 16px;'>" + text + "</font></div>";
+            
+            // Inventory size
+            html += "<div>INV: " + characters[key].inv + "</div>";
+
+            // Exp per sec
+            if(characters[key].ctype != "merchant")
+                html += "<div>" + characters[key].xpps.toFixed(0) + " Xp/sec</div>";
+
+            // Target name style='padding: 10 0 0 0'
+            if(characters[key].ctype != "merchant")
+                html += "<div style='text-align: left; padding: 10 0 0 0'>Target: " + characters[key].target + "</div>";
+            
+            // Time to level up
+            if(characters[key].ctype != "merchant")
+                html += "<div style='text-align: left'>toUp: " + characters[key].toUp + "</div>";
+            
             html += "</div>";
         }
     }
